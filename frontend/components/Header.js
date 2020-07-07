@@ -16,10 +16,11 @@ const Logo = styled.h1`
   }
   @media (max-width: 1300px) {
     margin: 0;
+
     text-align: center;
   }
   margin-top: 0;
-  margin-bottom: 0;
+  margin-bottom: -0.5rem;
 `;
 
 const StyledHeader = styled.header`
