@@ -36,7 +36,7 @@ const Form = styled.form`
     font-size: 1.5rem;
     &:focus {
       outline: 0;
-      border-color: ${props => props.theme.red};
+      border-color: ${props => props.theme.lyon};
     }
   }
   button,
@@ -64,7 +64,8 @@ const Form = styled.form`
     }
     /* animated stripe */
     &::before {
-      margin-bottom: 6rem;
+      margin-bottom: 2rem;
+      /* margin-bottom: 6rem; */
       height: 1rem;
       content: '';
       display: block;
@@ -79,6 +80,23 @@ const Form = styled.form`
       background-size: 50% auto;
       animation: ${loading} 0.5s linear infinite;
     }
+  }
+  .file {
+    max-width: 40rem;
+    margin: 0 auto 2rem auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    &:hover,
+    &:active {
+      background-color: ${props => props.theme.lemon};
+    }
+  }
+  .hidden {
+    width: 0;
+    opacity: 0;
   }
 `;
 

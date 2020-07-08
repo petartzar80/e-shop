@@ -5,6 +5,7 @@ import Router from 'next/router';
 
 import Form from './styles/Form';
 import Error from './ErrorMessage';
+import { cloudinary } from '../cloudinary';
 
 const CREATE_ITEM_MUTATION = gql`
   mutation CREATE_ITEM_MUTATION(
@@ -48,6 +49,25 @@ const CreateItem = () => {
     }));
   };
 
+  const uploadFile = async e => {
+    const files = e.target.files;
+    const data = new FormData();
+    data.append('file', files[0]);
+    data.append('upload_preset', 'e-shop');
+
+    const res = await fetch(cloudinary, {
+      method: 'POST',
+      body: data,
+    });
+    const file = await res.json();
+
+    setStateValues(values => ({
+      ...values,
+      image: file.secure_url,
+      largeImage: file.eager[0].secure_url,
+    }));
+  };
+
   return (
     <Form
       onSubmit={async e => {
@@ -66,6 +86,21 @@ const CreateItem = () => {
     >
       <Error error={error} />
       <fieldset disabled={loading} aria-busy={loading}>
+        <label htmlFor="file" className="file">
+          <span>Click here to upload an image.</span>
+          <input
+            type="file"
+            id="file"
+            name="file"
+            className="hidden"
+            placeholder="Upload an image"
+            required
+            onChange={e => uploadFile(e)}
+          />
+        </label>
+        {stateValues.image && (
+          <img width="200" src={stateValues.image} alt="Upload Preview" />
+        )}
         <label htmlFor="title">
           Title
           <input
