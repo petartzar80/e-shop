@@ -1,6 +1,7 @@
 import propTypes from 'prop-types';
 import Link from 'next/link';
 
+import DeleteItem from './DeleteItem';
 import Title from './styles/Title';
 import ItemStyles from './styles/ItemStyles';
 import PriceTag from './styles/PriceTag';
@@ -34,7 +35,7 @@ const Item = props => {
           <a className="edit">Edit</a>
         </Link>
         <button>Add To Cart</button>
-        <button>Delete </button>
+        <DeleteItem id={item.id}>Delete</DeleteItem>
       </div>
     </ItemStyles>
   );
