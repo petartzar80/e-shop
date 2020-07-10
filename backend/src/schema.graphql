@@ -7,9 +7,12 @@ type Mutation {
    deleteItem(id: ID!): Item
 }
 
+# prettier-ignore
 type Query {
-  items: [Item]!
+  items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, first: Int): [Item]!
   item(where: ItemWhereUniqueInput!): Item
+  # aggregate data without the data itself:
+  itemsConnection(where: ItemWhereInput): ItemConnection!
 }
 
 # this import makes all the types and inputs available to us here

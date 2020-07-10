@@ -3,10 +3,19 @@ import gql from 'graphql-tag';
 import styled from 'styled-components';
 
 import Item from './Item';
+import Pagination from './Pagination';
+import { perPage } from '../config';
 
 const ALL_ITEMS_QUERY = gql`
-  query ALL_ITEMS_QUERY {
-    items {
+  query ALL_ITEMS_QUERY(
+    $skip: Int = 0,
+    $first: Int = ${perPage}
+  ) {
+    items(
+      first: $first
+      skip: $skip
+      orderBy: createdAt_DESC
+    ) {
       id
       title
       price
@@ -29,21 +38,24 @@ const ItemsList = styled.div`
   margin: 0 auto;
 `;
 
-const Items = () => {
-  const { data, error, loading } = useQuery(ALL_ITEMS_QUERY);
+const Items = props => {
+  const { data, error, loading } = useQuery(ALL_ITEMS_QUERY, {
+    variables: {
+      // for instance: page 2 * 4 - 4 => skip first 4
+      skip: props.page * perPage - perPage,
+    },
+  });
   if (loading) return <p>Loading Items...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  console.log('data: ', data);
-
   return (
     <Center>
-      <p>Control I'm here</p>
       <ItemsList>
         {data.items.map(item => (
           <Item item={item} key={item.id} />
         ))}
       </ItemsList>
+      <Pagination page={props.page} />
     </Center>
   );
 };
