@@ -14,6 +14,7 @@ type Query {
   item(where: ItemWhereUniqueInput!): Item
   # aggregate data without the data itself:
   itemsConnection(where: ItemWhereInput): ItemConnection!
+  me: User
 }
 
 # this import makes all the types and inputs available to us here
