@@ -1,6 +1,13 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const setCookie = (ctx, token) => {
+  ctx.response.cookie('token', token, {
+    httpOnly: true, // preventing js attacks
+    maxAge: 1000 * 60 * 24 * 365, // 1 year cookie
+  });
+};
+
 const Mutations = {
   async createItem(parent, args, ctx, info) {
     // TODO: check if they are logged in
@@ -64,11 +71,27 @@ const Mutations = {
     // create JWT token for them
     const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
     // set the jwt as a cookie on the response
-    ctx.response.cookie('token', token, {
-      httpOnly: true, // preventing js attacks
-      maxAge: 1000 * 60 * 24 * 365, // 1 year cookie
-    });
+    setCookie(ctx, token);
     // return the user to the browser
+    return user;
+  },
+
+  async signin(parent, { email, password }, ctx, info) {
+    // 1. check if there is a user with that email
+    const user = await ctx.db.query.user({ where: { email } });
+    if (!user) {
+      throw new Error(`No such user found for email: ${email}`);
+    }
+    // 2. check if the password is correct
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      throw new Error('Invalid password!');
+    }
+    // 3. generate the JWT token
+    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
+    // 4. set the cookie with the token
+    setCookie(ctx, token);
+    // 5. return the user
     return user;
   },
 };

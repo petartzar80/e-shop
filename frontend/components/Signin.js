@@ -6,13 +6,9 @@ import Form from './styles/Form';
 import Error from './ErrorMessage';
 import { CURRENT_USER_QUERY } from './User';
 
-const SIGNUP_MUTATION = gql`
-  mutation SIGNUP_MUTATION(
-    $email: String!
-    $name: String!
-    $password: String!
-  ) {
-    signup(email: $email, name: $name, password: $password) {
+const SIGNIN_MUTATION = gql`
+  mutation SIGNIN_MUTATION($email: String!, $password: String!) {
+    signin(email: $email, password: $password) {
       id
       email
       name
@@ -20,9 +16,8 @@ const SIGNUP_MUTATION = gql`
   }
 `;
 
-const Signup = () => {
+const Signin = () => {
   const initValues = {
-    name: '',
     password: '',
     email: '',
   };
@@ -35,7 +30,7 @@ const Signup = () => {
     });
   };
 
-  const [signup, { loading, error }] = useMutation(SIGNUP_MUTATION, {
+  const [signin, { loading, error }] = useMutation(SIGNIN_MUTATION, {
     variables: {
       ...userInfo,
     },
@@ -48,13 +43,12 @@ const Signup = () => {
       method="post"
       onSubmit={async e => {
         e.preventDefault();
-        await signup();
-        // clear out the user info
-        setUserInfo({ name: '', email: '', password: '' });
+        await signin();
+        setUserInfo({ email: '', password: '' });
       }}
     >
       <fieldset disabled={loading} aria-busy={loading}>
-        <h2>Sign Up for An Account</h2>
+        <h2>Sign Into Your Account</h2>
         <Error error={error} />
         <label htmlFor="email">
           Email
@@ -63,16 +57,6 @@ const Signup = () => {
             name="email"
             placeholder="email"
             value={userInfo.email}
-            onChange={e => saveUserInfo(e)}
-          />
-        </label>
-        <label htmlFor="name">
-          Name
-          <input
-            type="text"
-            name="name"
-            placeholder="name"
-            value={userInfo.name}
             onChange={e => saveUserInfo(e)}
           />
         </label>
@@ -87,10 +71,10 @@ const Signup = () => {
           />
         </label>
 
-        <button type="submit">Sign Up!</button>
+        <button type="submit">Sign In!</button>
       </fieldset>
     </Form>
   );
 };
 
-export default Signup;
+export default Signin;
