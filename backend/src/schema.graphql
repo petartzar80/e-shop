@@ -23,6 +23,7 @@ type Query {
   # aggregate data without the data itself:
   itemsConnection(where: ItemWhereInput): ItemConnection!
   me: User
+  users: [User]!
 }
 
 # redefining type User so as not to expose resetToken info from prisma
