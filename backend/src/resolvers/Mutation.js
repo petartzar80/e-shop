@@ -42,6 +42,17 @@ const Mutations = {
     const updates = { ...args };
     // remove the ID from the updates
     delete updates.id;
+    // find the item
+    const where = { id: args.id };
+    const item = await ctx.db.query.item({ where }, `{ id title user { id }}`);
+    // check if they own the item or have the permission
+    const ownsItem = item.user.id === ctx.request.userId;
+    const hasPermissions = ctx.request.user.permissions.some(permission =>
+      ['ADMIN', 'ITEMUPDATE'].includes(permission)
+    );
+    if (!ownsItem && !hasPermissions) {
+      throw new Error("You don't have permission to do that!");
+    }
     // run the update method
     return ctx.db.mutation.updateItem(
       {
@@ -57,9 +68,15 @@ const Mutations = {
   async deleteItem(parent, args, ctx, info) {
     const where = { id: args.id };
     // 1. find the item
-    const item = await ctx.db.query.item({ where }, `{ id title }`);
+    const item = await ctx.db.query.item({ where }, `{ id title user { id }}`);
     // 2. check if they own the item or have the permission
-    // TODO
+    const ownsItem = item.user.id === ctx.request.userId;
+    const hasPermissions = ctx.request.user.permissions.some(permission =>
+      ['ADMIN', 'ITEMDELETE'].includes(permission)
+    );
+    if (!ownsItem && !hasPermissions) {
+      throw new Error("You don't have permission to do that!");
+    }
     // 3. delete it
     return ctx.db.mutation.deleteItem({ where }, info);
   },
