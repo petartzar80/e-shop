@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { randomBytes } = require('crypto');
 const { promisify } = require('util');
 
+const { hasPermission } = require('../utils');
 const { transport, makeANiceEmail } = require('../mail');
 
 const setCookie = (ctx, token) => {
@@ -180,6 +181,39 @@ const Mutations = {
     setCookie(ctx, token);
     // 8. return the new user
     return updatedUser;
+  },
+
+  async updatePermissions(parent, args, ctx, info) {
+    // 1. Check if they're logged in
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in to do that.');
+    }
+    // 2. Query the current user
+    const currentUser = await ctx.db.query.user(
+      {
+        where: {
+          id: ctx.request.userId,
+        },
+      },
+      info
+    );
+    // 3. Check if they have permissions to do this
+    hasPermission(currentUser, ['ADMIN', 'PERMISSIONUPDATE']);
+    // 4. Update the permissions
+    return ctx.db.mutation.updateUser(
+      {
+        data: {
+          // permissions have to be set bc they're enum
+          permissions: {
+            set: args.permissions,
+          },
+        },
+        where: {
+          id: args.userId, // we may be updating someone else
+        },
+      },
+      info
+    );
   },
 };
 
